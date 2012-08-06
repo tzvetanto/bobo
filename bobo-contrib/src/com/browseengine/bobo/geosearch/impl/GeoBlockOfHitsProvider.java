@@ -32,7 +32,7 @@ public class GeoBlockOfHitsProvider implements IGeoBlockOfHitsProvider {
      * @throws IOException 
      */
     @Override
-    public DocsSortedByDocId getBlock(GeoSegmentReader geoSegmentReader, IDeletedDocs deletedDocsWithinSegment,
+    public DocsSortedByDocId getBlock(GeoSegmentReader geoSegmentReader, IDeletedDocs deletedDocsWithinSegment, byte filterBitmask,
             final double minimumLongitude, final double minimumLatitude, final int minimumDocid, 
             final double maximumLongitude, final double maximumLatitude, final int maximumDocid) throws IOException {
         final byte filterByte = GeoRecord.DEFAULT_FILTER_BYTE;
@@ -46,7 +46,8 @@ public class GeoBlockOfHitsProvider implements IGeoBlockOfHitsProvider {
         while (iterator.hasNext()) {
             GeoRecord geoRecord = iterator.next();
             LatitudeLongitudeDocId longitudeLatitudeDocId = geoConverter.toLongitudeLatitudeDocId(geoRecord);
-            if (minimumLongitude <= longitudeLatitudeDocId.longitude && longitudeLatitudeDocId.longitude <= maximumLongitude 
+            if (((geoRecord.filterByte & filterBitmask) != 0) &&
+            		minimumLongitude <= longitudeLatitudeDocId.longitude && longitudeLatitudeDocId.longitude <= maximumLongitude 
                     && minimumLatitude <= longitudeLatitudeDocId.latitude && longitudeLatitudeDocId.latitude <= maximumLatitude 
                     && minimumDocid <= longitudeLatitudeDocId.docid && longitudeLatitudeDocId.docid <= maximumDocid
                     ) {

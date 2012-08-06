@@ -26,12 +26,13 @@ public class GeoQuery extends Query {
     double centroidLongitude;
     double centroidLatitude;
     float rangeInMiles;
+    byte filterBitmask;
     
     private static final float KM_TO_MILES = (float)(3.1/5);
     private static final float MINIMUM_RANGE_IN_MILES = 0.001f;
     private static final float MAXIMUM_RANGE_IN_MILES = 500f;
     
-    public GeoQuery(double centroidLongitude, double centroidLatitude, Float rangeInMiles, Float rangeInKilometers) {
+    public GeoQuery(double centroidLongitude, double centroidLatitude, Float rangeInMiles, Float rangeInKilometers, byte filterBitmask) {
         this.centroidLongitude = centroidLongitude;
         this.centroidLatitude = centroidLatitude;
         if (!(null == rangeInMiles ^ null == rangeInKilometers)) {
@@ -48,6 +49,8 @@ public class GeoQuery extends Query {
         if (!GeoUtil.isValidLongitude(centroidLongitude) || !GeoUtil.isValidLatitude(centroidLatitude)) {
             throw new RuntimeException("bad centroidLongitude "+centroidLongitude+" or centroidLatitude "+centroidLatitude);
         }
+
+        this.filterBitmask = filterBitmask;
     }
     
     
@@ -75,6 +78,10 @@ public class GeoQuery extends Query {
      */
     public float getRangeInMiles() {
         return rangeInMiles;
+    }
+
+    public byte getFilterBitmask() {
+    	return filterBitmask;
     }
 
 

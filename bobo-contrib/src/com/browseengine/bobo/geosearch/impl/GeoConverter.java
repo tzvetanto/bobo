@@ -39,6 +39,11 @@ public class GeoConverter implements IGeoConverter {
     }
     
     @Override
+    public void setFieldToBitmaskMapping(Map<String, Byte> mapping) {
+    	bitmasks = mapping;
+    }
+    
+    @Override
     public IFieldNameFilterConverter makeFieldNameFilterConverter() {
         MappedFieldNameFilterConverter mappedFieldNameFilterConverter = new MappedFieldNameFilterConverter();
         for (Entry<String, Byte> bitmask : bitmasks.entrySet()) {

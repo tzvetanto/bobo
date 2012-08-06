@@ -42,6 +42,7 @@ public class GeoScorer extends Scorer {
     private final double centroidLongitudeDegrees;
     private final double centroidLatitudeDegrees;
     private final float rangeInMiles;
+    private final byte filterBitmask;
     
     // TODO: add dynamic refinement as the query goes, 
     // to collapse the range
@@ -70,7 +71,8 @@ public class GeoScorer extends Scorer {
                      IDeletedDocs                wholeIndexDeletedDocs, 
                      double                      centroidLongitudeDegrees,
                      double                      centroidLatitudeDegrees,
-                     float                       rangeInMiles) {
+                     float                       rangeInMiles,
+                     byte                        filterBitmask) {
                      super                       (weight);
         
         this.geoConverter = new GeoConverter();
@@ -81,6 +83,7 @@ public class GeoScorer extends Scorer {
         this.centroidLongitudeDegrees = centroidLongitudeDegrees;
         this.centroidLatitudeDegrees = centroidLatitudeDegrees;
         this.rangeInMiles = rangeInMiles;
+        this.filterBitmask = filterBitmask;
         
         startDocidOfCurrentPartition = -1;
         
@@ -121,10 +124,12 @@ public class GeoScorer extends Scorer {
     private float score(Collection<GeoRecordAndLongitudeLatitudeDocId> values) {
         float minimumDistanceMiles = 9999999f;
         for (GeoRecordAndLongitudeLatitudeDocId value : values) {
-            float distanceMiles = computeDistance.getDistanceInMiles(centroidLongitudeDegrees, centroidLatitudeDegrees, 
-                    value.longitudeLatitudeDocId.longitude, value.longitudeLatitudeDocId.latitude);
-            if (distanceMiles < minimumDistanceMiles) {
-                minimumDistanceMiles = distanceMiles;
+            if((value.geoRecord.filterByte & filterBitmask) != 0) {
+                float distanceMiles = computeDistance.getDistanceInMiles(centroidLongitudeDegrees, centroidLatitudeDegrees, 
+                        value.longitudeLatitudeDocId.longitude, value.longitudeLatitudeDocId.latitude);
+                if (distanceMiles < minimumDistanceMiles) {
+                    minimumDistanceMiles = distanceMiles;
+                }
             }
         }
         return score(minimumDistanceMiles);
@@ -257,7 +262,7 @@ public class GeoScorer extends Scorer {
         int maximumDocidInPartition = Math.min(maxDocInPartition, 
                 (blockNumber + 1) * BLOCK_SIZE);
         
-        currentBlockScoredDocs = geoBlockOfHitsProvider.getBlock(currentSegment, deletedDocsWithinSegment,
+        currentBlockScoredDocs = geoBlockOfHitsProvider.getBlock(currentSegment, deletedDocsWithinSegment, filterBitmask,
                 minimumLongitudeDegrees, minimumLatitudeDegrees, minimumDocidInPartition, 
                 maximumLongitudeDegrees, maximumLatitudeDegrees, maximumDocidInPartition);
         currentBlockGlobalMaxDoc = startDocidOfCurrentPartition + maximumDocidInPartition;

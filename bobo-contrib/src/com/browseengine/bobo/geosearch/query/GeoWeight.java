@@ -78,8 +78,9 @@ public class GeoWeight extends Weight {
         double centroidLongitudeDegrees = geoQuery.getCentroidLongitude();
         double centroidLatitudeDegrees = geoQuery.getCentroidLatitude();
         float rangeInMiles = geoQuery.getRangeInMiles();
+        byte filterBitmask = geoQuery.getFilterBitmask();
         return new GeoScorer(this, segmentsInOrder, wholeIndexDeletedDocs, 
-                centroidLongitudeDegrees, centroidLatitudeDegrees, rangeInMiles);
+                centroidLongitudeDegrees, centroidLatitudeDegrees, rangeInMiles, filterBitmask);
     }
     
     /**

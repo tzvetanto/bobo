@@ -34,7 +34,7 @@ public interface IGeoBlockOfHitsProvider {
      * @param maximumDocid
      * @return
      */
-    DocsSortedByDocId getBlock(GeoSegmentReader geoSegmentReader, IDeletedDocs deletedDocsWithinSegment,
+    DocsSortedByDocId getBlock(GeoSegmentReader geoSegmentReader, IDeletedDocs deletedDocsWithinSegment, byte filterBitmask,
             double minimumLongitude, double minimumLatitude, int minimumDocid, 
             double maximumLongitude, double maximumLatitude, int maximumDocid) throws IOException;
 }
