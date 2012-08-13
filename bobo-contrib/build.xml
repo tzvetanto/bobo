@@ -5,10 +5,10 @@
   <property name="lucene-patch.src.dir" value="lucene-patch" />
   <property name="target.dir" value="target" />
   <property name="revision" value="0.1" />
-  <property name="git.revision" value="123" />
+  <property name="git.revision" value="300" />
   <property name="jar.name" value="bobo-contrib" />
   <property name="lucene-patch.jar.name" value="lucene-patch" />
-  <property name="jar.name.append" value="-${revision}" />
+  <property name="jar.name.append" value="-${revision}.${git.revision}" />
 
   <property name="test.dir" value="test" />
   <property name="test.src.dir" value="test" />
