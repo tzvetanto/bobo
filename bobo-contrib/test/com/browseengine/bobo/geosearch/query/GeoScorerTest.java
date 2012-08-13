@@ -4,6 +4,7 @@
 package com.browseengine.bobo.geosearch.query;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -376,6 +377,73 @@ public class GeoScorerTest {
         setupQuerySearcherReaderScorer();
         
         verifyNextDocAndScoreSF();
+    }
+    
+    @Test
+    public void test_advance_and_score6_multi() throws Exception {
+        
+		treeSet = new TreeSet<GeoRecord>(new GeoRecordComparator());
+    	treeSet.add(geoConverter.toGeoRecord((byte) 0x01, MISS_FAR_WEST));
+    	treeSet.add(geoConverter.toGeoRecord((byte) 0x02, HIT0_CLOSE));
+    	treeSet.add(geoConverter.toGeoRecord((byte) 0x02, MISS_FAR_SOUTH));
+    	treeSet.add(geoConverter.toGeoRecord((byte) 0x01, HIT_EXACT));
+        treeSet.add(geoConverter.toGeoRecord((byte) 0x02, HIT1_CLOSE));
+        treeSet.add(geoConverter.toGeoRecord((byte) 0x01, HIT2_CLOSE));
+        
+        GeoRecordBTree geoRecordBTree = new GeoRecordBTree(treeSet);
+        maxDoc = treeSet.size();
+        geoSegmentReader = new MyGeoSegmentReader(geoRecordBTree, maxDoc);
+        
+        geoSubReaders.add(geoSegmentReader);
+	
+		searcher = null;
+        
+        Directory directory = buildEmptyDirectory();
+		
+        geoIndexReader = new GeoIndexReader(directory, new GeoSearchConfig()) {
+            @Override
+            public List<GeoSegmentReader> getGeoSegmentReaders() {
+                return geoSubReaders;
+            }
+            
+            @Override
+            public IndexReader[] getSequentialSubReaders() {
+                return null;
+            }
+        };
+
+        // search on geo field 0x01
+        geoQuery = new GeoQuery(centroidLongitude, centroidLatitude, rangeInMiles, null, (byte) 0x01);
+        geoWeight = geoQuery.createWeight(searcher);
+        boolean scoreDocsInOrder = true;
+        boolean topScorer = true;
+        scorer = geoWeight.scorer(geoIndexReader, scoreDocsInOrder, topScorer);
+        
+		
+        docid = scorer.advance(3);
+        assertEquals("1st hit docid", HIT_EXACT.docid, docid);
+        
+        score = scorer.score();
+        float expectedScoreLowerBound = 0.001f;
+        float expectedScoreUpperBound = 1f;
+        assertTrue("docid " + docid + " expected score in range [" + expectedScoreLowerBound + ", " + expectedScoreUpperBound + "], actual score " + score, 
+                expectedScoreLowerBound <= score && score <= expectedScoreUpperBound);
+            
+        verifyEndAdvance(maxDoc);
+        
+        // search on geo field 0x02
+        geoQuery = new GeoQuery(centroidLongitude, centroidLatitude, rangeInMiles, null, (byte) 0x02);
+        geoWeight = geoQuery.createWeight(searcher);        
+        scorer = geoWeight.scorer(geoIndexReader, scoreDocsInOrder, topScorer);
+        
+        docid = scorer.advance(4);
+        assertEquals("1st hit docid", HIT1_CLOSE.docid, docid);
+        
+        score = scorer.score();
+        assertTrue("docid " + docid + " expected score in range [" + expectedScoreLowerBound + ", " + expectedScoreUpperBound + "], actual score " + score, 
+                expectedScoreLowerBound <= score && score <= expectedScoreUpperBound);
+        
+        verifyEndAdvance(maxDoc);
     }
     
     private void verifyAdvanceAndScore() throws Exception {
