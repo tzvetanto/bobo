@@ -190,7 +190,7 @@ public class GeoSearchMergingFunctionalTest extends GeoSearchFunctionalTezt {
         double lattitude = coordinate.getLatitude();
         float miles = 500;
          
-        GeoQuery query = new GeoQuery(longitude, lattitude, miles, null);
+        GeoQuery query = new GeoQuery(longitude, lattitude, miles, null, (byte) 0xFF);
         TopDocs topDocs = searcher.search(query, 10);
         
         List<String> expectedResults = new Vector<String>();

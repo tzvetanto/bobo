@@ -152,7 +152,7 @@ public class GeoScorerTest {
         
         treeSet3 = new TreeSet<GeoRecord>(new GeoRecordComparator());
         for (LatitudeLongitudeDocId raw : indexedDocuments3) {
-            GeoRecord geoRecord = geoConverter.toGeoRecord(GeoRecord.DEFAULT_FILTER_BYTE, raw);
+            GeoRecord geoRecord = geoConverter.toGeoRecord((byte) 0x01, raw);
             treeSet3.add(geoRecord);
         }
         geoRecordBTree3 = new GeoRecordBTree(treeSet3);
@@ -177,7 +177,7 @@ public class GeoScorerTest {
         
         treeSet = new TreeSet<GeoRecord>(new GeoRecordComparator());
         for (LatitudeLongitudeDocId raw : indexedDocuments) {
-            GeoRecord geoRecord = geoConverter.toGeoRecord(GeoRecord.DEFAULT_FILTER_BYTE, raw);
+            GeoRecord geoRecord = geoConverter.toGeoRecord((byte) 0x01, raw);
             treeSet.add(geoRecord);
         }
         
@@ -205,7 +205,7 @@ public class GeoScorerTest {
             }
         };
 
-        geoQuery = new GeoQuery(centroidLongitude, centroidLatitude, rangeInMiles, null);
+        geoQuery = new GeoQuery(centroidLongitude, centroidLatitude, rangeInMiles, null, (byte) 0xFF);
         geoWeight = geoQuery.createWeight(searcher);
         boolean scoreDocsInOrder = true;
         boolean topScorer = true;

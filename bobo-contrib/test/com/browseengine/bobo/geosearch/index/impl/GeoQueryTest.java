@@ -65,7 +65,7 @@ public class GeoQueryTest {
         MyGeoSegmentReader geoSegmentReader = new MyGeoSegmentReader(geoRecordBTree, indexedDocument.size());
         geoSubReaders = new ArrayList<GeoSegmentReader>(); 
         geoSubReaders.add(geoSegmentReader);
-        GeoQuery geoQuery = new GeoQuery(gcord.getLongitude(), gcord.getLatitude(), rangeInMiles, null);
+        GeoQuery geoQuery = new GeoQuery(gcord.getLongitude(), gcord.getLatitude(), rangeInMiles, null, (byte)0xFF);
         GeoWeight geoWeight = (GeoWeight)geoQuery.createWeight(null);
         Directory directory = buildEmptyDirectory();
         geoIndexReader = new GeoIndexReader(directory, new GeoSearchConfig());
@@ -156,7 +156,7 @@ public class GeoQueryTest {
         TreeSet<GeoRecord> treeSet = new  TreeSet<GeoRecord>(new GeoRecordComparator());
         GeoConverter gc = new GeoConverter();
         for (int i = 0; i < indexedDocument.size(); i++) {
-            treeSet.add(gc.toGeoRecord((byte)0, indexedDocument.get(i)));
+            treeSet.add(gc.toGeoRecord((byte)0x01, indexedDocument.get(i)));
         }
         return treeSet;
     }
