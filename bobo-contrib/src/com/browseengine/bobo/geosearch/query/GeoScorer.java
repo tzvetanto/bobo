@@ -22,6 +22,7 @@ import com.browseengine.bobo.geosearch.impl.GeoConverter;
 import com.browseengine.bobo.geosearch.index.impl.GeoSegmentReader;
 import com.browseengine.bobo.geosearch.score.IComputeDistance;
 import com.browseengine.bobo.geosearch.score.impl.HaversineComputeDistance;
+import com.browseengine.bobo.geosearch.score.impl.PythagoreanComputeDistance;
 
 /**
  * @author Ken McCracken
@@ -87,7 +88,8 @@ public class GeoScorer extends Scorer {
         
         startDocidOfCurrentPartition = -1;
         
-        this.computeDistance = new HaversineComputeDistance();
+        // not accurate at all but enough for just scoring
+        this.computeDistance = new PythagoreanComputeDistance();
         
         init();
     }
