@@ -115,16 +115,16 @@ public class GeoScorer extends Scorer {
     public float score() throws IOException {
         assert docid >= 0 && docid != NO_MORE_DOCS;
 
-        return score(currentDoc.getValue());
+        return (float) score(currentDoc.getValue());
     }
     
     /**
-     * about 5 feet.
+     * almost 1m
      */
-    private static final float MINIMUM_DISTANCE_WE_CARE_ABOUT_MILES = 0.0001f;
+    public static final double MINIMUM_DISTANCE_WE_CARE_ABOUT_MILES = 1 / 1609.344;
     
-    private float score(Collection<GeoRecordAndLongitudeLatitudeDocId> values) {
-        float minimumDistanceMiles = 9999999f;
+    private double score(Collection<GeoRecordAndLongitudeLatitudeDocId> values) {
+        double minimumDistanceMiles = 9999999f;
         for (GeoRecordAndLongitudeLatitudeDocId value : values) {
             if((value.geoRecord.filterByte & filterBitmask) != 0) {
                 float distanceMiles = computeDistance.getDistanceInMiles(centroidLongitudeDegrees, centroidLatitudeDegrees, 
@@ -143,11 +143,11 @@ public class GeoScorer extends Scorer {
      * @param minimumDistanceMiles
      * @return
      */
-    private float score(float minimumDistanceMiles) {
+    private double score(double minimumDistanceMiles) {
         if (minimumDistanceMiles < MINIMUM_DISTANCE_WE_CARE_ABOUT_MILES) {
-            return 1f;
+            return 1.0;
         }
-        return MINIMUM_DISTANCE_WE_CARE_ABOUT_MILES/minimumDistanceMiles;
+        return MINIMUM_DISTANCE_WE_CARE_ABOUT_MILES / minimumDistanceMiles;
     }
 
     /**
